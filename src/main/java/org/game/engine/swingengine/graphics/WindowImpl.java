@@ -107,12 +107,15 @@ public class WindowImpl implements Window {
         impl.setResizable(resizable);
     }
 
+    // TODO: linux gnome x11: неправильное определение текущей частоты кадров. результат 50, ожидаемо 165
     private int getRefreshRate(){
-        return 165;
-//        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-//        var devices = env.getScreenDevices();
-//        var dmMode = devices[0].getDisplayMode();
-//        return dmMode.getRefreshRate();
+        // TODO: программа не умеет работать с многомониторными конфигурациями
+        // программа настраивается под один монитор и при переносе на 2 монитор программа будет все равно работать
+        // с конфигом первого
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        var devices = env.getScreenDevices();
+        var dmMode = devices[0].getDisplayMode();
+        return dmMode.getRefreshRate();
     }
 
     @Override
@@ -126,7 +129,7 @@ public class WindowImpl implements Window {
     }
 
     @Override
-    public void setKeyListener(String keycode, Runnable onClicked, Runnable whilePressed, Runnable onReleased) {
+    public void setKeyAction(String keycode, Runnable onClicked, Runnable whilePressed, Runnable onReleased) {
         keyListeners.put(keycode, new Runnable[]{onClicked, whilePressed, onReleased});
     }
 

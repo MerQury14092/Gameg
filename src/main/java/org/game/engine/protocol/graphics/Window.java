@@ -19,6 +19,6 @@ public interface Window {
      *
      * @param onReleased Функция выполняемая единожды при отпуске клавиши, при ненадобности оставить null
      */
-    void setKeyListener(String keycode, Runnable onClicked, Runnable whilePressed, Runnable onReleased);
+    void setKeyAction(String keycode, Runnable onClicked, Runnable whilePressed, Runnable onReleased);
     Image getContent();
 }
