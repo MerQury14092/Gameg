@@ -17,7 +17,7 @@ public class WindowImpl implements Window {
     private final Map<String, Runnable[]> keyListeners;
     private final List<String> pressedKeys;
     public WindowImpl(Vector pos, Vector size, String title){
-        int refreshRate = getRefreshRate();
+        int refreshRate = 165;
         System.out.println("REFRESH_RATE = "+refreshRate);
         pressedKeys = new ArrayList<>();
         keyListeners = new HashMap<>();

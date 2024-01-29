@@ -3,23 +3,23 @@ package org.game.engine;
 import org.game.engine.protocol.graphics.Image;
 import org.game.engine.protocol.graphics.Window;
 import org.game.engine.protocol.math.Vector;
+import org.game.engine.swingengine.graphics.BufferedImage;
 import org.game.engine.swingengine.graphics.WindowImpl;
+import org.game.projectlib.ThreadTools;
 
 public abstract class SwingGame implements Game{
     private final Window window;
+    private final Image frameBuffer;
     private volatile int currentFramePerSecond, fps;
     protected SwingGame(int x, int y, int width, int height, String name){
         currentFramePerSecond = 0;
         window = new WindowImpl(new Vector(x, y), new Vector(width, height), name);
         window.setResizable(false);
+        frameBuffer = new BufferedImage(new Vector(width, height));
 
         Thread fpsUpdater = new Thread(() -> {
             for (;;){
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                ThreadTools.sleep(1000);
                 fps = currentFramePerSecond;
                 currentFramePerSecond = 0;
             }
@@ -28,7 +28,8 @@ public abstract class SwingGame implements Game{
         fpsUpdater.start();
         Thread renderThread = new Thread(() -> {
             for (;;){
-                render(window.getContent());
+                render(frameBuffer);
+                window.getContent().getGraphicsContext().draw(new Vector(0, 0), frameBuffer);
                 currentFramePerSecond += 1;
             }
         });
