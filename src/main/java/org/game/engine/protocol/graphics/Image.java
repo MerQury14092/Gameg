@@ -8,4 +8,5 @@ public interface Image {
     Vector getSize();
     void clear();
     GraphicsContext getGraphicsContext();
+    Image clone();
 }

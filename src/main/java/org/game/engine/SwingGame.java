@@ -12,33 +12,32 @@ public abstract class SwingGame implements Game{
     private final Image frameBuffer;
     private volatile int currentFramePerSecond, fps;
     protected SwingGame(int x, int y, int width, int height, String name){
+        System.setProperty("sun.java2d.opengl", "true");
+        load();
         currentFramePerSecond = 0;
         window = new WindowImpl(new Vector(x, y), new Vector(width, height), name);
         window.setResizable(false);
         frameBuffer = new BufferedImage(new Vector(width, height));
 
-        Thread fpsUpdater = new Thread(() -> {
+        ThreadTools.runDaemon("fpsUpdater", () -> {
             for (;;){
-                ThreadTools.sleep(1000);
-                fps = currentFramePerSecond;
+                ThreadTools.sleep(125);
+                fps = currentFramePerSecond*8;
                 currentFramePerSecond = 0;
             }
         });
-        fpsUpdater.setDaemon(true);
-        fpsUpdater.start();
-        Thread renderThread = new Thread(() -> {
+        ThreadTools.runDaemon("renderThread", () -> {
             for (;;){
                 render(frameBuffer);
                 window.getContent().getGraphicsContext().draw(new Vector(0, 0), frameBuffer);
                 currentFramePerSecond += 1;
             }
         });
-        renderThread.setDaemon(true);
-        renderThread.start();
-        System.out.println("render thread started");
     }
 
-    public abstract void render(Image frameBuffer);
+    @Override
+    public void load() {}
+
     public int getFPS(){
         return fps;
     }

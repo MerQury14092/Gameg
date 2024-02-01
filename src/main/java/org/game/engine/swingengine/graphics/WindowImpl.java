@@ -1,8 +1,10 @@
 package org.game.engine.swingengine.graphics;
 
+import org.game.engine.protocol.core.ClArgs;
 import org.game.engine.protocol.graphics.Image;
 import org.game.engine.protocol.graphics.Window;
 import org.game.engine.protocol.math.Vector;
+import org.game.projectlib.ThreadTools;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +19,7 @@ public class WindowImpl implements Window {
     private final Map<String, Runnable[]> keyListeners;
     private final List<String> pressedKeys;
     public WindowImpl(Vector pos, Vector size, String title){
-        int refreshRate = 165;
+        int refreshRate = getRefreshRate();
         System.out.println("REFRESH_RATE = "+refreshRate);
         pressedKeys = new ArrayList<>();
         keyListeners = new HashMap<>();
@@ -34,7 +36,7 @@ public class WindowImpl implements Window {
         content.setPreferredSize(new Dimension(size.a, size.b));
         impl.setContentPane(content);
         impl.pack();
-        Thread repaintThread = new Thread(() -> {
+        ThreadTools.runDaemon("repaintThread", () -> {
             for (;;) {
                 try {
                     Thread.sleep(1000/refreshRate);
@@ -44,9 +46,7 @@ public class WindowImpl implements Window {
                 content.repaint();
             }
         });
-        repaintThread.setDaemon(true);
-        repaintThread.start();
-        Thread keyHandleThread = new Thread(() -> {
+        ThreadTools.runDaemon("keyActionHandler", () -> {
             for (;;)
             {
                 try {
@@ -62,8 +62,6 @@ public class WindowImpl implements Window {
                 }
             }
         });
-        keyHandleThread.setDaemon(true);
-        keyHandleThread.start();
         impl.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {}
@@ -112,6 +110,8 @@ public class WindowImpl implements Window {
         // TODO: программа не умеет работать с многомониторными конфигурациями
         // программа настраивается под один монитор и при переносе на 2 монитор программа будет все равно работать
         // с конфигом первого
+        if(ClArgs.options.containsKey("refresh_rate"))
+            return (int)ClArgs.options.get("refresh_rate");
         GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
         var devices = env.getScreenDevices();
         var dmMode = devices[0].getDisplayMode();

@@ -4,6 +4,7 @@ import org.game.engine.protocol.graphics.Image;
 import org.game.engine.protocol.graphics.Window;
 
 public interface Game {
+    void load();
     void render(Image frameBuffer);
     Window getWindow();
     int getFPS();

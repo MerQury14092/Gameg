@@ -36,3 +36,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Engine test ###
+/src/main/java/org/game/engine/test/*
+/src/main/resources/apple.png
